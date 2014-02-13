@@ -1,17 +1,15 @@
 /**
- * A EXIF parser.
+ * @file
+ * An EXIF parser.
  *
- * A highly modifed version the original script here:
+ * This code is primarily based on the work that
+ * Johannes la Poutré (http://squio.nl) did here:
+ *
  * http://userscripts.org/scripts/review/5390
- *
- *
  */
 
 
-/* vim: ts=4 noet ai :
-$Id: exifthumbnailfetcher.user.js $
-
-
+/**
 
 LICENSE
 =======
@@ -30,66 +28,7 @@ You should have received a copy of the GNU General Public License along
 with this program; if not, write to the Free Software Foundation, Inc.,
 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-
-CHANGELOG
-=========
-
-Version 1.20
-	- Fix: apply styles only when running the app
-
-Version 1.19
-	- more styles make unvisited directories stand out
-	- added feature to add viewed image links to browser history ("mark read")
-
-Version 1.18
-	- enlarge thumbnails to 260px height
-	- set siteIcon to loading / done symbol
-
-Version 1.17
-	- added .JPE extension
-	- NOTE: doesn't work with NoScript scripts disabled, switch (temporarily) on for now
-
-Version 1.16
-	- changed to work with page scripts disabled by NoScript extension
-
-Version 1.15
-	- Changed 'no exif' image to something less obtrusive
-	- Don't display EXIF button if there aren't any JPG/JPEG files
-	- Work on pages where the title is "Directory listing"
-
-Version 1.14
-	- Added "loading" icon
-	- Added "No exif thumbnail" image when appropriate
-
-Version 1.13
-	- Added convenient "EXIF" button to Apache index listings
-
-Version 1.12
-	- More robust in case a thumbnail is missing from exif data
-	- This was a problem for "JFIF standard 1.02" images
-
-Version 1.11
-	- Use request queue to avoid browser jamming
-	- Start through GM Command key
-	- Disabled GM logging
-
-Version 1.10
-	- Completely rewritten for asynchronous loading
-
-Version 1.00
-	- Initial version
-	- Proof of concept, not optimized in any way
-
-
-*/
-// ==UserScript==
-// @name           Exif Thumbnail Fetcher
-// @namespace      http://joe.lapoutre.com/BoT/Javascript
-// @description    Load embedded EXIF thumbnails for quick image preview
-// @include        *
-// @version	       1.19
-// ==/UserScript==
-
+ **/
 
 const SOI_MARKER = 0xFFD8;  // start of image
 const SOS_MARKER = 0xFFDA;  // start of stream

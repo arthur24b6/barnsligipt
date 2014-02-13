@@ -1,0 +1,33 @@
+.container {
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.container .navigation {
+  width: 10%;
+  margin-top: 100px;
+}
+
+.container .slides {
+  width: 80%;
+}
+
+
+#content {
+  display: none;
+  margin-left: auto;
+  margin-right: auto;
+}
+.thumbnail {
+  height: auto;
+  border: 1px solid black;
+  margin: 10px;
+  padding: 20px;
+  float: left;
+}
+
+/* Move down content because we have a fixed navbar that is 50px tall */
+body {
+  padding-top: 50px;
+  padding-bottom: 20px;
+}

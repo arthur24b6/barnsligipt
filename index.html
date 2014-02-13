@@ -1,114 +1,72 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
-    <title>Javascript Image Gallery</title>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width">
-    <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
-    <script type="text/javascript" src="/js/exif.js"></script>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="shortcut icon" href="assets/ico/favicon.ico">
+    <title>Barnsligipt javascript Image Gallery</title>
 
-    <style>
-      #content {
-      }
-      .thumbnail {
-        height: auto;
-        border: 1px solid black;
-        margin: 10px;
-        padding: 20px;
-        float: left;
-      }
-    </style>
+    <!-- Bootstrap core CSS -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-glyphicons.css" rel="stylesheet">
+    <!-- Custom styles for this template -->
+    <link href="css/custom.css" rel="stylesheet">
 
-    <script>
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
 
-/**
- * Application settings.
- */
-var settings = {
-  contentDirectory: 'images/',
-  baseURL: '/',
-  imagesPerPage: 5
-};
-
-/**
- * Utility function to return a path based on the instalation location.
- *
- * @param string path
- *   Create a URL to this path.
- * @returns string
- */
-function url(path) {
-  return settings.baseURL + path;
-}
-
-      $(document).ready(function() {
-
-/**
- * Get all the posts in the specified directory.
- *
- * @TODO handle directories.
- *
- * @returns array of post URIs
- */
-function getImageListing() {
-  var images = {};
-  // Get the directory listing. Note that the sorting is being done by Apache's
-  // list options. If this isn't supported on the server this won't work.
-  $.ajax({url: url(settings.contentDirectory), async: false})
-    .done(function(data) {
-      var items = $(data).find('a');
-      $(items).each(function(index, value) {
-        // Apache writes the URLs relative to the directory.
-        var uri = url(settings.contentDirectory) + $(this).attr('href');
-        var extension = uri.substr((~-uri.lastIndexOf(".") >>> 0) + 2);
-        // Only support jpeg/jpg file extensions.
-        if (/\.jpe?g?$/i.test ($(this).attr('href'))) {
-          images[index] = uri;
-        }
-      });
-    });
-  return images;
-}
-
-/**
- * Process a list of image URLs into image elements.
- *
- * @TODO handle pagination.
- * @TODO template.
- *
- * @param array images
- */
-function insertImages(images) {
-  $.each(images, function(index, src) {
-    if (index <= settings.imagesPerPage) {
-      var element = $('<a href="' + src +'"></a>');
-      var ep = new ExifProcessor(src);
-      ep.execute(generateThumb(element, src));
-
-      var wrapper = $('<div class="thumbnail">');
-      element.prependTo(wrapper);
-      $(wrapper).prependTo('#content');
-
-      $('a', wrapper).click(function() {
-        // Handle full element load.
-        console.log('click');
-        return false;
-      });
-    }
-    else {
-      return false;
-    }
-  });
-}
-
-  // Run the application.
-  var images = getImageListing();
-  insertImages(images);
-
-});
-    </script>
   </head>
   <body>
-    <div id="content"></div>
+
+
+    <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#">Barnsligipt</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="jumbotron">
+      <div class="container">
+        <h1>Caution!</h1>
+        <p>Barnsligipt is a javascript slideshow which uses JPEG EXIF thumbnails to provide a low bandwidth content for large images.</p>
+      </div>
+    </div>
+
+    <div class="container">
+
+      <div class="col-md-4 navigation previous">
+        <a>
+          <span class="glyphicon glyphicon-chevron-left"></span>
+        </a>
+      </div>
+
+      <div class="col-md-4 slides">
+        <div id="content" data-page="0"></div>
+      </div>
+
+      <div class="col-md-4 navigation next">
+        <a>
+          <span class="glyphicon glyphicon-chevron-right"></span>
+        </a>
+      </div>
+
+    </div>
+
+    <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
+    <script type="text/javascript" src="js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="js/exif.js"></script>
+    <script type="text/javascript" src="js/app.js"></script>
   </body>
 </html>
