@@ -1,7 +1,7 @@
 /**
  *
  * @file
- * Ember powered slideshow.
+ * Implements the barnsligipt slideshow in an ember framework.
  */
 
 
@@ -9,17 +9,7 @@ var slideshow = new Barnsligipt();
 
 var slides = slideshow.images;
 
-
-App = Ember.Application.create({
-  isViewing: false,
-  slide: 0,
-  page: 0,
-  settings: {
-    contentDirectory: 'images/',
-    imagesPerPage: 4
-  },
-  slides: slideshow.images
-});
+App = Ember.Application.create({});
 
 function spin () {
   $('.thumbnail, #slide').each(function () {

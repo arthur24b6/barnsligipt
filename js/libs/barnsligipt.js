@@ -1,8 +1,7 @@
 /**
  * @file
- *
+ * Basic slide show constructor which sits between Ember and EXIF data.
  */
-
 
 function Barnsligipt () {
 
@@ -17,8 +16,6 @@ function Barnsligipt () {
   /* ********************************* */
 
   this.slideIndex = 1;
-
-  //var images = [];
 
   this.init = function () {
     if (settings.useDemoImages) {
