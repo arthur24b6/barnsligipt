@@ -55,7 +55,7 @@ function Barnsligipt () {
       'exif': false,
       'loaded': false
      },{ 'id': 6,
-      'src': 'images/P1000893.jpg',
+      'src': 'images/P1000839.jpg',
       'thumbnail': false,
       'exif': false,
       'loaded': false
@@ -66,7 +66,7 @@ function Barnsligipt () {
       'loaded': false
      },{
       'id': 8,
-      'src': 'images/P2280017.jpg',
+      'src': 'images/P2280017.JPG',
       'thumbnail': false,
       'exif': false,
       'loaded': false
