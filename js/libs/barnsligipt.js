@@ -8,8 +8,9 @@ function Barnsligipt () {
 
   var settings = {
     contentDirectory: 'images/',
-    baseURL: window.location,
+    baseURL: '',
     imagesPerPage: 4,
+    gitHubListing: 'https://api.github.com/repos/arthur24b6/patar/contents/images',
     useDemoImages: true
   };
 
@@ -17,76 +18,14 @@ function Barnsligipt () {
 
   this.slideIndex = 1;
 
-  // Demo data for sites which do not have access to file lists.
-  var demoImages = [
-    {'id': 0,
-      'src': 'images/CRW_1355.jpg',
-      'thumbnail': false,
-      'exif': false,
-      'loaded': false
-     },{
-       'id': 1,
-      'src': 'images/CRW_1574.jpg',
-      'thumbnail': false,
-      'exif': false,
-      'loaded': false
-     },{
-      'id': 2,
-      'src': 'images/IMG_0457.jpg',
-      'thumbnail': false,
-      'exif': false,
-      'loaded': false
-     },{
-      'id': 3,
-      'src': 'images/P1000380.JPG',
-      'thumbnail': false,
-      'exif': false,
-      'loaded': false
-     },{
-       'id': 4,
-      'src': 'images/P1000774.jpg',
-      'thumbnail': false,
-      'exif': false,
-      'loaded': false
-     },{
-      'id': 5,
-      'src': 'images/P1000816.jpg',
-      'thumbnail': false,
-      'exif': false,
-      'loaded': false
-     },{ 'id': 6,
-      'src': 'images/P1000839.jpg',
-      'thumbnail': false,
-      'exif': false,
-      'loaded': false
-     },{ 'id': 7,
-      'src': 'images/P2270009.JPG',
-      'thumbnail': false,
-      'exif': false,
-      'loaded': false
-     },{
-      'id': 8,
-      'src': 'images/P2280017.JPG',
-      'thumbnail': false,
-      'exif': false,
-      'loaded': false
-     },{
-      'id': 9,
-      'src': 'images/P1000794.jpg',
-      'thumbnail': false,
-      'exif': false,
-      'loaded': false
-     }
-  ];
-
-  var images = [];
+  //var images = [];
 
   this.init = function () {
     if (settings.useDemoImages) {
-      this.images = demoImages;
+      this.getGitHubListing();
     }
     else {
-      this.getImageListing();
+      this.getFileListing();
     }
   };
 
@@ -229,9 +168,10 @@ function Barnsligipt () {
    *
    * @returns array of post URIs
    */
-  this.getImageListing = function () {
+  this.getFileListing = function () {
     var listing = new Array;
     // Get the directory listing.
+    console.log(settings);
     $.ajax({url: url(settings.contentDirectory), async: false})
       .done(function(data) {
         var items = $(data).find('a');
@@ -252,6 +192,30 @@ function Barnsligipt () {
         });
       });
     this.images = listing;
+  };
+
+  /**
+   * Utility function to get a listing of files from a github repo.
+   */
+  this.getGitHubListing = function () {
+    var listing = new Array;
+    $.ajax({url: settings.gitHubListing, async: false})
+      .done(function(data) {
+        $.each(data, function(index, value) {
+        // Only support jpeg/jpg file extensions.
+        if (/\.jpe?g?$/i.test (value.name)) {
+          listing.push({
+            'id': index,
+            'src': value.path,
+            'thumbnail': false,
+            'exif': false,
+            'loaded': false
+           });
+        }
+      });
+   });
+   this.images = listing;
+
   };
 
 /**
