@@ -1,0 +1,26 @@
+
+#
+# OS garbage, Editors, IDEs, etc
+#
+.DS_Store
+.svn
+code_coverage
+*~
+*.swp
+coverage
+.coverage
+nbproject
+.nbproject
+build
+.build
+.settings
+.settings/.*
+.project
+project
+*.project
+.buildpath
+*.db
+*.tmproj
+*.sublime-project
+.idea
+*.idea/*
