@@ -1,6 +1,6 @@
 /**
  * @file
- *
+ * Basic slide show constructor which sits between Ember and EXIF data.
  */
 
 function Barnsligipt () {
