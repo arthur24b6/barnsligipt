@@ -1,10 +1,8 @@
 /**
- *
  * @file
  *
  */
 
-// @TODO allow options to be overridden.
 
 function Barnsligipt () {
 
@@ -176,10 +174,11 @@ function Barnsligipt () {
           // Only support jpeg/jpg file extensions.
           if (/\.jpe?g?$/i.test ($(this).attr('href'))) {
             listing.push({
-              'id' : index,
-              'src' : uri,
-              'thumbnail' : false,
-              'exif' : false
+              'id': index,
+              'src': uri,
+              'thumbnail': false,
+              'exif': false,
+              'loaded': false
             });
           }
         });
@@ -194,24 +193,41 @@ function Barnsligipt () {
  * This fetches the exif thumbnail from the source and fires an event when
  * the image has been loaded.
  *
+ * @TODO this should not use Ember.set()
+ *
  * @param object src
  *   The original image path.
  */
-this.getThumbnail = function(slide) {
+this.loadImage = function(slide) {
+  if (slide.loaded) {
+    return;
+  }
+  var data = {};
   var ep = new ExifProcessor(slide.src);
   return ep.execute(function () {
     // Image has exif thumbnail.
     if (ep.exifInfo.isValid) {
       var thumbnail = "data:image/jpeg," + ep.exifInfo.exifData.toHexString(ep.exifInfo.thumbOffset, ep.exifInfo.thumbLength);
       Ember.set(slide, 'thumbnail', thumbnail);
-      Ember.set(slide, 'exit', ep.exifInfo.exifData.toHexString(ep.exifInfo.thumbOffset, ep.exifInfo.thumbLength));
+      Ember.set(slide, 'exif', exifDisplay(ep.exifInfo));
     }
     // Image does not have an exif thumbnail.
     else {
       Ember.set(slide, 'thumbnail', slide.src);
     }
+    Ember.set(slide, 'loaded', true);
   });
 };
+
+  /**
+   * Utility function to display EXIF data.
+   * @param {type} data
+   * @returns {String}
+   */
+  function exifDisplay (data) {
+    var output = data.cameraMake + " " + data.cameraModel + " " + data.dateTime;
+    return output;
+  };
 
   this.init();
 };
