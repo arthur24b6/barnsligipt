@@ -6,21 +6,89 @@
 
 function Barnsligipt () {
 
-  var settings =  {
+  var settings = {
     contentDirectory: 'images/',
-    baseURL: '',
+    baseURL: window.location,
     imagesPerPage: 4,
-    loadingImage: 'assets/loading.gif'
+    useDemoImages: true
   };
+
+  /* ********************************* */
 
   this.slideIndex = 1;
 
-  var images =  {};
+  // Demo data for sites which do not have access to file lists.
+  var demoImages = [
+    {'id': 0,
+      'src': 'images/CRW_1355.jpg',
+      'thumbnail': false,
+      'exif': false,
+      'loaded': false
+     },{
+       'id': 1,
+      'src': 'images/CRW_1574.jpg',
+      'thumbnail': false,
+      'exif': false,
+      'loaded': false
+     },{
+      'id': 2,
+      'src': 'images/IMG_0457.jpg',
+      'thumbnail': false,
+      'exif': false,
+      'loaded': false
+     },{
+      'id': 3,
+      'src': 'images/P1000380.JPG',
+      'thumbnail': false,
+      'exif': false,
+      'loaded': false
+     },{
+       'id': 4,
+      'src': 'images/P1000774.jpg',
+      'thumbnail': false,
+      'exif': false,
+      'loaded': false
+     },{
+      'id': 5,
+      'src': 'images/P1000816.jpg',
+      'thumbnail': false,
+      'exif': false,
+      'loaded': false
+     },{ 'id': 6,
+      'src': 'images/P1000893.jpg',
+      'thumbnail': false,
+      'exif': false,
+      'loaded': false
+     },{ 'id': 7,
+      'src': 'images/P2270009.JPG',
+      'thumbnail': false,
+      'exif': false,
+      'loaded': false
+     },{
+      'id': 8,
+      'src': 'images/P2280017.jpg',
+      'thumbnail': false,
+      'exif': false,
+      'loaded': false
+     },{
+      'id': 9,
+      'src': 'images/P1000893.jpg',
+      'thumbnail': false,
+      'exif': false,
+      'loaded': false
+     }
+  ];
+
+  var images = [];
 
   this.init = function () {
-    this.getImageListing();
+    if (settings.useDemoImages) {
+      this.images = demoImages;
+    }
+    else {
+      this.getImageListing();
+    }
   };
-
 
   /**
    * Calculate the number of pages needed.
@@ -184,8 +252,7 @@ function Barnsligipt () {
         });
       });
     this.images = listing;
-  }
-
+  };
 
 /**
  * Utility function gets EXIF thumbnail.
