@@ -72,7 +72,7 @@ function Barnsligipt () {
       'loaded': false
      },{
       'id': 9,
-      'src': 'images/P1000893.jpg',
+      'src': 'images/P1000794.jpg',
       'thumbnail': false,
       'exif': false,
       'loaded': false
