@@ -1,7 +1,7 @@
 /**
  *
  * @file
- * Basic slide show constructure which sits between Ember and EXIF data.
+ * Implements the barnsligipt slideshow in an ember framework.
  */
 
 
@@ -10,16 +10,7 @@ var slideshow = new Barnsligipt();
 var slides = slideshow.images;
 
 
-App = Ember.Application.create({
-  isViewing: false,
-  slide: 0,
-  page: 0,
-  settings: {
-    contentDirectory: 'images/',
-    imagesPerPage: 4
-  },
-  slides: slideshow.images
-});
+App = Ember.Application.create({});
 
 function spin () {
   $('.thumbnail, #slide').each(function () {
@@ -40,12 +31,10 @@ var slideIndex = {
   page: 0
 };
 
-
 App.Router.map(function() {
   this.resource('slides', { path: 'slides/:page_id' });
   this.resource('slide', { path: 'slide/:slide_id' });
 });
-
 
 App.IndexRoute = Ember.Route.extend({
   model: function() {
