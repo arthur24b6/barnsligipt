@@ -1,212 +1,165 @@
 /**
  *
  * @file
- *
+ * Basic slide show constructure which sits between Ember and EXIF data.
  */
 
-/**
- * Application settings.
- */
-var settings = {
-  contentDirectory: 'images/',
-  baseURL: '',
-  imagesPerPage: 3
-};
+
+var slideshow = new Barnsligipt();
+
+var slides = slideshow.images;
 
 
-function Barnsligipt () {
-
-  this.init = function () {
-   this.getImageListing();
-
-  }
-
-  this.settings =  {
+App = Ember.Application.create({
+  isViewing: false,
+  slide: 0,
+  page: 0,
+  settings: {
     contentDirectory: 'images/',
-    baseURL: '',
-    imagesPerPage: 3
-  };
+    imagesPerPage: 4
+  },
+  slides: slideshow.images
+});
 
-  this.slideIndex = 0;
-  this.images =  {};
+function spin () {
+  $('.thumbnail, #slide').each(function () {
+    $(this).spin('small', '#999999');
+  });
 
-  /**
-   * Get the next set of images to display.
-   * @returns images
-   */
-  this.nextSet = function () {
-    var count = this.slideCount();
-    var images = {};
+  $('.thumbnail img, #slide img').hide();
 
-    var stop = this.slideIndex + this.settings.imagesPerPage;
-    if (stop <= count) {
-      // slice on start/stop
-      for (var i = this.slideIndex; i < stop; i++) {
-        images[i] = this.images[i];
-      }
-    }
-    else {
-      var remainder = stop - count;
-      // First slide is the current index to the total number of slides.
-      for (var i; i <= count; i++) {
-        images[i] = this.images[i];
-      }
-      // Second group is the first slide to the remainder.
-      for (var i = 0; i <= remainder; i++) {
-        images[i] = this.images[i];
-      }
-    }
-    return images;
-  };
+  $('.thumbnail img, #slide img').on('load', function () {
+    $(this).fadeIn(function() {
+      $(this).parent('div').spin(false);
+    });
+  });
+};
 
-  this.previousSet = function  () {
-    return images;
-  };
-
-  this.next = function () {
-    var images = this.nextSet();
-
-  }
-
-  this.slideCount = function () {
-    return Object.keys(this.images).length;
-  };
-
-  this.url = function(path) {
-    return this.settings.baseURL + path;
-  };
-
-
-  /**
-   * Get all the posts in the specified directory.
-   *
-   * @TODO handle directories.
-   *
-   * @returns array of post URIs
-   */
-  this.getImageListing = function () {
-    var images = {};
-    // Get the directory listing. Note that the sorting is being done by Apache's
-    // list options. If this isn't supported on the server this won't work.
-    $.ajax({url: url(settings.contentDirectory), async: false})
-      .done(function(data) {
-        var items = $(data).find('a');
-        $(items).each(function(index, value) {
-          // Apache writes the URLs relative to the directory.
-          var uri = url(settings.contentDirectory) + $(this).attr('href');
-          var extension = uri.substr((~-uri.lastIndexOf(".") >>> 0) + 2);
-          // Only support jpeg/jpg file extensions.
-          if (/\.jpe?g?$/i.test ($(this).attr('href'))) {
-            images[index] = uri;
-          }
-        });
-      });
-    this.images = images;
-  }
-
+var slideIndex = {
+  slide: 0,
+  page: 0
 };
 
 
+App.Router.map(function() {
+  this.resource('slides', { path: 'slides/:page_id' });
+  this.resource('slide', { path: 'slide/:slide_id' });
+});
 
-/**
- * Current data
- */
 
-/**
- * Utility function to return a path based on the instalation location.
- *
- * @param string path
- *   Create a URL to this path.
- * @returns string
- */
-function url(path) {
-  return settings.baseURL + path;
-}
+App.IndexRoute = Ember.Route.extend({
+  model: function() {
+    var test = slideshow.images.slice(0, 4);
+    Ember.$.each(test, function(index, slide) {
+      slideshow.loadImage(slide);
+    });
+    return test;
+  },
+  actions: {
+    next: function() {
+      this.replaceWith('slides', 1);
+    },
+    previous: function(slide) {
+      this.replaceWith('slides', slideshow.pageCount());
+    }
+  }
+});
 
-$(document).ready(function() {
 
-var slideshow = new Barnsligipt;
-
-/**
- * Get all the posts in the specified directory.
- *
- * @TODO handle directories.
- *
- * @returns array of post URIs
- */
-function getImageListing() {
-  var images = {};
-  // Get the directory listing. Note that the sorting is being done by Apache's
-  // list options. If this isn't supported on the server this won't work.
-  $.ajax({url: url(settings.contentDirectory), async: false})
-    .done(function(data) {
-      var items = $(data).find('a');
-      $(items).each(function(index, value) {
-        // Apache writes the URLs relative to the directory.
-        var uri = url(settings.contentDirectory) + $(this).attr('href');
-        var extension = uri.substr((~-uri.lastIndexOf(".") >>> 0) + 2);
-        // Only support jpeg/jpg file extensions.
-        if (/\.jpe?g?$/i.test ($(this).attr('href'))) {
-          images[index] = uri;
-        }
+ App.IndexView = Ember.View.extend({
+   // @TODO this is only called on the first route load.
+  didInsertElement: function() {
+    this.$('.thumbnail, #slide').each(function () {
+      $(this).spin('small', '#999999');
+    });
+    this.$('.thumbnail img, #slide img').hide();
+    this.$('.thumbnail img, #slide img').on('load', function () {
+      $(this).fadeIn(function() {
+        $(this).parents('div').spin(false);
       });
     });
-  return images;
-}
+  }
+ });
 
-/**
- * Process a list of image URLs into image elements.
- *
- * @TODO handle pagination.
- * @TODO template.
- *
- * @param array images
- */
-function insertImages(images) {
-  console.log(images);
-  $.each(images, function(index, src) {
-      var element = $('<a href="' + src +'"></a>');
-      var ep = new ExifProcessor(src);
-      ep.execute(generateThumb(element, src));
+App.ApplicationController = Ember.Controller.extend({});
 
-      var wrapper = $('<div class="thumbnail">');
-      element.prependTo(wrapper);
-      $(wrapper).prependTo('#content');
-
-      $('a', wrapper).click(function() {
-        // Handle full element load.
-        console.log('click');
-        return false;
-      });
-  });
-
-
-
-  // Fade the main content area in.
-  $('#content').fadeIn(3000);
-}
-
-  // Run the application.
-
-  slideshow.images = getImageListing();
-  var images = slideshow.nextSet();
-  // Insert the set of images
-  // @TODO this should be the set of images
-  insertImages(images);
-
-  // Capture clicks on the navigation.
-  $('.navigation').click(function() {
-    $('#content').html('');
-    if ($(this).hasClass('next')) {
-      var images = slideshow.nextSet();
-      insertImages(images);
+App.SlidesRoute = Ember.Route.extend({
+  model: function(params) {
+    Ember.set(slideIndex, 'page', params.page_id);
+    var slidePage = slideshow.nextSet();
+    Ember.$.each(slidePage, function(index, slide) {
+      slideshow.loadImage(slide);
+    });
+    return slidePage;
+  },
+  actions: {
+    next: function(slides) {
+      var page = Number(slideIndex.page) + 1;
+      if (page >= slideshow.pageCount()) {
+        page = 0;
+      }
+      this.replaceWith('slides', page);
+    },
+    previous: function(slides) {
+      var page = slideIndex.page - 1;
+      if (Number(slideIndex.page) <= 0) {
+        page = slideshow.pageCount();
+      }
+      this.replaceWith('slides', page);
     }
-
-    if ($(this).hasClass('previous')) {
-
-    }
-
-
-  });
-
+  }
 });
+
+
+App.SlideRoute = Ember.Route.extend({
+  beforeModel: function(transition) {
+    this.controllerFor('application').set('isViewing', true);
+  },
+  model: function(params) {
+    Ember.set(slideIndex, 'slide', params.slide_id);
+    var slide = Ember.get(slides, params.slide_id);
+    slideshow.loadImage(slide);
+    return slide;
+  },
+  afterModel: function() {
+    console.log('after render');
+  },
+  actions: {
+    next: function() {
+      var page = Number(slideIndex.slide) + 1;
+      if (page > slideshow.slideCount()) {
+        page = 1;
+      }
+      this.replaceWith('slide', page);
+    },
+    previous: function() {
+      var page = Number(slideIndex.slide) - 1;
+      if (page <= 0) {
+        page = slideshow.slideCount();
+      }
+      this.replaceWith('slide', page);
+    },
+    close: function() {
+      this.replaceWith('application');
+    }
+  },
+  deactivate: function(reason) {
+    this.controllerFor('application').set('isViewing', false);
+  }
+});
+
+App.SlideView = Ember.View.extend({
+  // @TODO this is only called on the first route load.
+  didInsertElement: function() {
+    console.log('view!');
+    this.$('.thumbnail, #slide').each(function () {
+      $(this).spin('small', '#999999');
+    });
+    this.$('.thumbnail img, #slide img').hide();
+    this.$('.thumbnail img, #slide img').on('load', function () {
+      $(this).fadeIn(function() {
+        $(this).parents('div').spin(false);
+      });
+    });
+  }
+ });

@@ -5,9 +5,9 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="shortcut icon" href="assets/ico/favicon.ico">
-    <title>Barnsligipt javascript Image Gallery</title>
 
-    <!-- Bootstrap core CSS -->
+    <title>Barnsligipt Javascript Image Gallery</title>
+
     <link href="css/bootstrap.min.css" rel="stylesheet">
     <link href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-glyphicons.css" rel="stylesheet">
     <!-- Custom styles for this template -->
@@ -20,53 +20,76 @@
     <![endif]-->
 
   </head>
+
   <body>
 
-
+    <script type="text/x-handlebars">
     <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
-      <div class="container">
-        <div class="navbar-header">
-          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-            <span class="sr-only">Toggle navigation</span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </button>
-          <a class="navbar-brand" href="#">Barnsligipt</a>
-        </div>
+     {{#link-to 'index' class="navbar-brand"}}{{title}}{{/link-to}}
+      <div class="navbar-right barnsligipt-navigation">
+        <a href="#" {{action 'previous' slide}} ><span class="glyphicon glyphicon-chevron-left"></span></a>
+        <a href="#" {{action 'next' slide}} ><span class="glyphicon glyphicon-chevron-right"></span></a>
+        {{#if isViewing}}
+          {{#link-to 'index' }}<span class="glyphicon glyphicon-remove"></span>{{/link-to}}
+        {{/if}}
       </div>
     </div>
+    {{outlet}}
+    </script>
 
+    <script type="text/x-handlebars" id="index">
     <div class="jumbotron">
       <div class="container">
         <h1>Caution!</h1>
-        <p>Barnsligipt is a javascript slideshow which uses JPEG EXIF thumbnails to provide a low bandwidth content for large images.</p>
+        <p>Barnsligipt is a javascript slideshow which uses JPEG EXIF thumbnails to provide low bandwidth content for large images.</p>
+<p>Barnsligipt uses Apache's directory listing to build a list of images which it will use in the slideshow. EXIF thumbnail is used to populate the small image sizes if present</p>
       </div>
     </div>
-
-    <div class="container">
-
-      <div class="col-md-4 navigation previous">
-        <a>
-          <span class="glyphicon glyphicon-chevron-left"></span>
-        </a>
+    <div class="container-fluid front slides">
+      <div class="row-fluid">
+        <div class="span3">
+          {{#each model}}
+          <div class="thumbnail">
+            {{#link-to 'slide' this}}<img {{bind-attr src=thumbnail}} {{bind-attr data-id=id}} />{{/link-to}}
+            {{#link-to 'slide' this}}{{src}}{{/link-to}}
+          </div>
+          {{/each}}
+        </div>
       </div>
-
-      <div class="col-md-4 slides">
-        <div id="content" data-page="0"></div>
-      </div>
-
-      <div class="col-md-4 navigation next">
-        <a>
-          <span class="glyphicon glyphicon-chevron-right"></span>
-        </a>
-      </div>
-
     </div>
+    </script>
 
-    <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
-    <script type="text/javascript" src="js/bootstrap.min.js"></script>
-    <script type="text/javascript" src="js/exif.js"></script>
-    <script type="text/javascript" src="js/app.js"></script>
+    <script type="text/x-handlebars" data-template-name="slides">
+      <div class="container-fluid slides">
+        <div class="row-fluid">
+          <div class="span3">
+            {{#each model}}
+            <div class="thumbnail">
+              {{#link-to 'slide' this}}<img {{bind-attr src=thumbnail}} {{bind-attr data-id=id}} />{{/link-to}}
+            </div>
+            {{/each}}
+          </div>
+        </div>
+      </div>
+    </script>
+
+    <script type="text/x-handlebars" id="slide">
+    <div id="slide">
+      <img {{bind-attr src=src}} {{bind-attr data-id=id}} />
+      {{#if exif}}
+      <div class="exif-data">{{exif}}</div>
+      {{/if}}
+    </div>
+    </script>
+
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+    <script src="js/libs/spin.min.js"></script>
+    <script src="js/libs/jquery.spin.js"></script>
+    <script src="js/libs/handlebars.min.js"></script>
+    <script src="js/libs/ember.min.js"></script>
+    <script src="js/libs/exif.js"></script>
+    <script src="js/libs/barnsligipt.js"></script>
+    <script src="js/app.js"></script>
+
   </body>
 </html>

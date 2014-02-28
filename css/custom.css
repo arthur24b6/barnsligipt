@@ -1,33 +1,77 @@
 .container {
-  max-width: 800px;
+  max-width: 100%;
   margin-left: auto;
   margin-right: auto;
 }
-.container .navigation {
-  width: 10%;
-  margin-top: 100px;
-}
 
-.container .slides {
-  width: 80%;
+.container #slides {
+  width: 100%;
 }
-
 
 #content {
+  vertical-align: middle
+}
+
+.thumbnail {
+  float: left;
+  margin: 0 20px;
+  padding: 20px;
+  min-height: 200px;
+  min-width: 200px;
+}
+
+.barnsligipt-navigation {
+  font-size: 30px;
+  color: #cccccc;
+  margin-right: 60px;
+  margin-top: 10px;
+}
+
+/* Only show the close icon when a full slide is loaded */
+.barnsligipt-navigation .exit {
   display: none;
+}
+
+#slide {
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  background-color: #111111;
+}
+
+#slide img {
+  height: 100%;
+  display: block;
   margin-left: auto;
   margin-right: auto;
 }
-.thumbnail {
-  height: auto;
-  border: 1px solid black;
-  margin: 10px;
-  padding: 20px;
-  float: left;
+
+.exif-data {
+  background-color: rgba(200, 200, 200, 0.8);
+  margin-left: 20%;
+  margin-right: 20%;
+  margin-top: -21px;
+  position: absolute;
+  border: 1px solid #aaaaaa;
+  width: 60%;
+  padding-left: 10px;
 }
 
-/* Move down content because we have a fixed navbar that is 50px tall */
-body {
-  padding-top: 50px;
-  padding-bottom: 20px;
+
+.slides {
+  margin-top: 200px;
+}
+
+.jumbotron {
+  margin-top: 20px;
+  padding: 20px;
+}
+
+.front.slides {
+  margin-top: 0px;
+}
+
+h1 {
+  font-size: 2em;
+  margin: 0.17em 0;
 }
