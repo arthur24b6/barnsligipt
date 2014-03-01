@@ -39,8 +39,11 @@
     <div class="jumbotron">
       <div class="container">
         <h1>Caution!</h1>
-        <p>Barnsligipt is a javascript slideshow which uses JPEG EXIF thumbnails to provide low bandwidth content for large images.</p>
-<p>Barnsligipt uses Apache's directory listing to build a list of images which it will use in the slideshow. EXIF thumbnail is used to populate the small image sizes if present</p>
+        <p>Barnsligipt is a javascript slideshow/gallery which uses JPEG EXIF
+        thumbnails to provide low bandwidth content for large images.</p>
+        <p>Barnsligipt uses Apache's or GitHub's directory listing to build a
+        list of images which it will use. EXIF thumbnail data is pulled from the
+        images to populate the thumbnails- if that data is present.</p>
       </div>
     </div>
     <div class="container-fluid front slides">
@@ -81,8 +84,6 @@
     </script>
 
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
-    <script src="js/libs/spin.min.js"></script>
-    <script src="js/libs/jquery.spin.js"></script>
     <script src="js/libs/handlebars.min.js"></script>
     <script src="js/libs/ember.min.js"></script>
     <script src="js/libs/exif.min.js"></script>

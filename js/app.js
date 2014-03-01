@@ -150,25 +150,6 @@ App.EmberSlides = Ember.Object.extend({
 });
 
 
-/**
- * Generic function to bind the spin behavior.
- */
-function spin () {
-  $('.thumbnail, #slide').each(function () {
-    $(this).spin('small', '#999999');
-  });
-  $('.thumbnail img, #slide img').hide();
-  $('.thumbnail img, #slide img').on('load', function () {
-    $(this).fadeIn(function() {
-      $(this).parent('div').spin(false);
-    });
-  });
-};
-
-Ember.$(document).ready(function () {
-  //spin();
-});
-
 var slides = App.EmberSlides.create();
 
 App.ApplicationController = Ember.Controller.extend({});
@@ -177,6 +158,7 @@ App.Router.map(function() {
   this.resource('slides', { path: 'slides/:page_id' });
   this.resource('slide', { path: 'slide/:slide_id' });
 });
+
 
 App.IndexRoute = Ember.Route.extend({
   model: function() {
@@ -189,13 +171,6 @@ App.IndexRoute = Ember.Route.extend({
     previous: function(slide) {
       this.replaceWith('slides', slides.count());
     }
-  }
-});
-
-App.IndexView = Ember.View.extend({
-  // Implements the spinner on loaded slides;
-  didInsertElement: function() {
-    // spin();
   }
 });
 
@@ -223,19 +198,10 @@ App.SlidesRoute = Ember.Route.extend({
   }
 });
 
-App.SlidesView = Ember.View.extend({
-  // Implements the spinner on loaded slides;
-  didInsertElement: function() {
-    // spin();
-  }
-});
-
 
 App.SlideRoute = Ember.Route.extend({
   beforeModel: function(transition) {
     this.controllerFor('application').set('isViewing', true);
-    Ember.$('#slide img').hide();
-    Ember.$('#slide').spin('small', '#999999');
   },
   model: function(params) {
     slides.set('currentSlide', params.slide_id);
@@ -262,16 +228,5 @@ App.SlideRoute = Ember.Route.extend({
   },
   deactivate: function(reason) {
     this.controllerFor('application').set('isViewing', false);
-  }
-});
-
-App.SlideView = Ember.View.extend({
-  // Once the element is inserted, bind the load event to show the images.
-  didInsertElement: function() {
-    this.$('img').load(function () {
-      $(this).fadeIn(900, function() {
-        $(this).parents('#slide').spin(false);
-      });
-    });
   }
 });
