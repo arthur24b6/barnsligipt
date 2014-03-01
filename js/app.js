@@ -151,11 +151,10 @@ App.EmberSlides = Ember.Object.extend({
     return display;
     }
 
-
 });
 
 
-
+Ember.$(document).ready(function() {spin();});
 
 function spin () {
   $('.thumbnail, #slide').each(function () {
@@ -171,7 +170,6 @@ function spin () {
   });
 };
 
-
 var slides = App.EmberSlides.create();
 
 App.Router.map(function() {
@@ -179,11 +177,10 @@ App.Router.map(function() {
   this.resource('slide', { path: 'slide/:slide_id' });
 });
 
-
 App.IndexRoute = Ember.Route.extend({
+   beforeModel: function(transition) { spin(); },
   model: function() {
     return slides.nextSet();
-    return slides.loadSet(0, 4);
   },
   actions: {
     next: function() {
@@ -195,26 +192,11 @@ App.IndexRoute = Ember.Route.extend({
   }
 });
 
-
-App.IndexView = Ember.View.extend({
-   // @TODO this is only called on the first route load.
-  didInsertElement: function() {
-    this.$('.thumbnail, #slide').each(function () {
-      $(this).spin('small', '#999999');
-    });
-    this.$('.thumbnail img, #slide img').hide();
-    this.$('.thumbnail img, #slide img').on('load', function () {
-      $(this).fadeIn(function() {
-        $(this).parents('div').spin(false);
-      });
-    });
-  }
- });
-
 App.ApplicationController = Ember.Controller.extend({});
 
 
 App.SlidesRoute = Ember.Route.extend({
+  beforeModel: function(transition) { spin(); },
   model: function(params) {
     slides.set('currentPage', params.page_id);
     return slides.nextSet();
@@ -240,6 +222,7 @@ App.SlidesRoute = Ember.Route.extend({
 
 App.SlideRoute = Ember.Route.extend({
   beforeModel: function(transition) {
+    spin();
     this.controllerFor('application').set('isViewing', true);
   },
   model: function(params) {
@@ -255,7 +238,7 @@ App.SlideRoute = Ember.Route.extend({
     next: function() {
       var page = Number(slides.currentSlide) + 1;
       if (page > slides.count()) {
-        page = 0;
+        page = 1;
       }
       this.replaceWith('slide', page);
     },
@@ -274,19 +257,3 @@ App.SlideRoute = Ember.Route.extend({
     this.controllerFor('application').set('isViewing', false);
   }
 });
-
-App.SlideView = Ember.View.extend({
-  // @TODO this is only called on the first route load.
-  didInsertElement: function() {
-    console.log('view!');
-    this.$('.thumbnail, #slide').each(function () {
-      $(this).spin('small', '#999999');
-    });
-    this.$('.thumbnail img, #slide img').hide();
-    this.$('.thumbnail img, #slide img').on('load', function () {
-      $(this).fadeIn(function() {
-        $(this).parents('div').spin(false);
-      });
-    });
-  }
- });
