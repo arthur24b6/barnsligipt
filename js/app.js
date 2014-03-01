@@ -165,6 +165,10 @@ function spin () {
   });
 };
 
+Ember.$(document).ready(function () {
+  //spin();
+});
+
 var slides = App.EmberSlides.create();
 
 App.ApplicationController = Ember.Controller.extend({});
@@ -230,6 +234,8 @@ App.SlidesView = Ember.View.extend({
 App.SlideRoute = Ember.Route.extend({
   beforeModel: function(transition) {
     this.controllerFor('application').set('isViewing', true);
+    Ember.$('#slide img').hide();
+    Ember.$('#slide').spin('small', '#999999');
   },
   model: function(params) {
     slides.set('currentSlide', params.slide_id);
@@ -256,5 +262,16 @@ App.SlideRoute = Ember.Route.extend({
   },
   deactivate: function(reason) {
     this.controllerFor('application').set('isViewing', false);
+  }
+});
+
+App.SlideView = Ember.View.extend({
+  // Once the element is inserted, bind the load event to show the images.
+  didInsertElement: function() {
+    this.$('img').load(function () {
+      $(this).fadeIn(900, function() {
+        $(this).parents('#slide').spin(false);
+      });
+    });
   }
 });
