@@ -1,15 +1,161 @@
 /**
- *
  * @file
  * Implements the barnsligipt slideshow in an ember framework.
  */
 
-
-var slideshow = new Barnsligipt();
-
-var slides = slideshow.images;
-
 App = Ember.Application.create({});
+
+
+/**
+ * An ember slide object.
+ *
+ * This reimplements the barnsligipt slide object so that Ember can have easier
+ * access to update the properties.
+ *
+ * @type @exp;Ember@pro;Object@call;extend
+ */
+
+App.EmberSlide = Ember.Object.extend({
+  id: null,
+  src: null,
+  thumbnail: null,
+  exif: null,
+  loaded: false,
+
+  init: function() {
+   // this._super();
+   // this.set("chromosomes", ["x"]); // everyone gets at least one X chromosome
+  },
+
+  /**
+   * Get EXIF and thumbnail data for the image.
+   */
+  load: function() {
+    if (this.loaded) {
+      return this;
+    }
+    var ep = new ExifProcessor(this.src);
+    var image = this;
+    return ep.execute(function () {
+      image.thumbnail = image.src;
+      // Image has exif thumbnail.
+      if (ep.exifInfo.isValid) {
+        var thumbnail = "data:image/jpeg," + ep.exifInfo.exifData.toHexString(ep.exifInfo.thumbOffset, ep.exifInfo.thumbLength);
+        image.set('thumbnail', thumbnail);
+        image.exif = ep.exifInfo;
+      }
+      image.set('loaded', true);
+      return image;
+    });
+  }
+
+});
+
+/**
+ * Application slides.
+ * @type @exp;Ember@pro;Object@call;extend
+ */
+App.EmberSlides = Ember.Object.extend({
+  slides: [],
+  currentSlide: 0,
+  currentPage: 0,
+  slidesPerPage: 4,
+
+  count : function () {
+    var count = 0;
+    Ember.$.each(this.get('slides'), function(key, value) {
+      count++;
+    });
+    return count;
+  },
+
+  init: function () {
+    var barnsligipt = new Barnsligipt();
+    var slides = this.slides;
+    Ember.$.each(barnsligipt.images, function (key, image) {
+      var slide = App.EmberSlide.create({
+        'src': image.src,
+        'id': image.id
+      });
+      slides.push(slide);
+    });
+  },
+
+  /**
+   * Utility function to load a set of slides.
+   */
+  loadSet: function(start_index, stop_index) {
+    var display = this.get('slides').slice(start_index, stop_index);
+    Ember.$.each(display, function(index, slide) {
+      slide.load();
+    });
+    return display;
+  },
+
+  /**
+   * Determine the number of slide pages.
+   */
+  pageCount: function() {
+    var count = this.count() / this.slidesPerPage;
+    return Math.ceil(count);
+  },
+
+  /**
+   * Get the set of images that represent the current page.
+   */
+  nextSet: function() {
+    var count = this.count();
+    var start = this.currentPage * this.slidesPerPage;
+    var stop = start + this.slidesPerPage;
+
+    var display = [];
+
+    if (start > count) {
+      start = start - count;
+      stop = start + this.slidesPerPage;
+    }
+
+    // Normal case- return the next few.
+    if (stop <= count) {
+      for (var i = start; i < stop; i++) {
+        display.push(this.slides[i]);
+      }
+    }
+
+    // Next set of full images has to wrap around the list.
+    else if (stop > count && count > this.slidesPerPage) {
+      var remainder = stop - count;
+
+      // First slide is the current index to the total number of slides.
+      for (var i = start; i < count; i++) {
+        display.push(this.slides[i]);
+      }
+      // Second group is the first slide to the remainder.
+      for (var i = 0; i < remainder; i++) {
+        display.push(this.slides[i]);
+      }
+    }
+
+    // Not enough images to fill a complete set.
+    else {
+      for (var i = start; i <= count; i++) {
+        display.push(this.slides[i]);
+      }
+    }
+
+    // Load all image data.
+    $.each(display, function(key, slide) {
+      slide.load();
+    });
+
+    return display;
+    }
+
+
+});
+
+
+
 
 function spin () {
   $('.thumbnail, #slide').each(function () {
@@ -25,11 +171,8 @@ function spin () {
   });
 };
 
-var slideIndex = {
-  slide: 0,
-  page: 0
-};
 
+var slides = App.EmberSlides.create();
 
 App.Router.map(function() {
   this.resource('slides', { path: 'slides/:page_id' });
@@ -39,24 +182,21 @@ App.Router.map(function() {
 
 App.IndexRoute = Ember.Route.extend({
   model: function() {
-    var test = slideshow.images.slice(0, 4);
-    Ember.$.each(test, function(index, slide) {
-      slideshow.loadImage(slide);
-    });
-    return test;
+    return slides.nextSet();
+    return slides.loadSet(0, 4);
   },
   actions: {
     next: function() {
       this.replaceWith('slides', 1);
     },
     previous: function(slide) {
-      this.replaceWith('slides', slideshow.pageCount());
+      this.replaceWith('slides', slides.count());
     }
   }
 });
 
 
- App.IndexView = Ember.View.extend({
+App.IndexView = Ember.View.extend({
    // @TODO this is only called on the first route load.
   didInsertElement: function() {
     this.$('.thumbnail, #slide').each(function () {
@@ -73,27 +213,24 @@ App.IndexRoute = Ember.Route.extend({
 
 App.ApplicationController = Ember.Controller.extend({});
 
+
 App.SlidesRoute = Ember.Route.extend({
   model: function(params) {
-    Ember.set(slideIndex, 'page', params.page_id);
-    var slidePage = slideshow.nextSet();
-    Ember.$.each(slidePage, function(index, slide) {
-      slideshow.loadImage(slide);
-    });
-    return slidePage;
+    slides.set('currentPage', params.page_id);
+    return slides.nextSet();
   },
   actions: {
-    next: function(slides) {
-      var page = Number(slideIndex.page) + 1;
-      if (page >= slideshow.pageCount()) {
+    next: function() {
+      var page = Number(slides.currentPage) + 1;
+      if (page >= slides.pageCount()) {
         page = 0;
       }
       this.replaceWith('slides', page);
     },
-    previous: function(slides) {
-      var page = slideIndex.page - 1;
-      if (Number(slideIndex.page) <= 0) {
-        page = slideshow.pageCount();
+    previous: function() {
+      var page = slides.get('currentPage') - 1;
+      if (page <= 0) {
+        page = slides.pageCount();
       }
       this.replaceWith('slides', page);
     }
@@ -106,9 +243,9 @@ App.SlideRoute = Ember.Route.extend({
     this.controllerFor('application').set('isViewing', true);
   },
   model: function(params) {
-    Ember.set(slideIndex, 'slide', params.slide_id);
-    var slide = Ember.get(slides, params.slide_id);
-    slideshow.loadImage(slide);
+    slides.set('currentSlide', params.slide_id);
+    var slide = slides.slides.findBy('id', Number(params.slide_id));
+    slide.load();
     return slide;
   },
   afterModel: function() {
@@ -116,16 +253,16 @@ App.SlideRoute = Ember.Route.extend({
   },
   actions: {
     next: function() {
-      var page = Number(slideIndex.slide) + 1;
-      if (page > slideshow.slideCount()) {
-        page = 1;
+      var page = Number(slides.currentSlide) + 1;
+      if (page > slides.count()) {
+        page = 0;
       }
       this.replaceWith('slide', page);
     },
     previous: function() {
-      var page = Number(slideIndex.slide) - 1;
+      var page = Number(slides.currentSlide) - 1;
       if (page <= 0) {
-        page = slideshow.slideCount();
+        page = slides.count();
       }
       this.replaceWith('slide', page);
     },

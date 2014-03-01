@@ -3,6 +3,44 @@
  * Basic slide show constructor which sits between Ember and EXIF data.
  */
 
+
+
+function Slide (data) {
+
+  this.id = '';
+  this.src = '';
+  this.thumbnail = false;
+  this.exif = false;
+  this.loaded = false;
+
+  if (typeof data != 'undefined') {
+    for (var key in data) {
+      this[key] = data[key];
+    };
+  }
+
+  this.loadImage = function() {
+    if (this.loaded) {
+      return this;
+    }
+    var image = this;
+    var ep = new ExifProcessor(this.src);
+    return ep.execute(function () {
+      Ember.set(image, 'thumbnail', image.src);
+      // Image has exif thumbnail.
+      if (ep.exifInfo.isValid) {
+        var thumbnail = "data:image/jpeg," + ep.exifInfo.exifData.toHexString(ep.exifInfo.thumbOffset, ep.exifInfo.thumbLength);
+        Ember.set(image, 'thumbnail', thumbnail);
+        Ember.set(image, 'exif', ep.exifInfo);
+      }
+      Ember.set(image, 'loaded', true);
+      return image;
+    });
+  };
+
+};
+
+
 function Barnsligipt () {
 
   var settings = {
@@ -10,7 +48,7 @@ function Barnsligipt () {
     baseURL: '',
     imagesPerPage: 4,
     gitHubListing: 'https://api.github.com/repos/arthur24b6/patar/contents/images',
-    useDemoImages: true
+    //useDemoImages: true
   };
 
   /* ********************************* */
@@ -168,7 +206,6 @@ function Barnsligipt () {
   this.getFileListing = function () {
     var listing = new Array;
     // Get the directory listing.
-    console.log(settings);
     $.ajax({url: url(settings.contentDirectory), async: false})
       .done(function(data) {
         var items = $(data).find('a');
@@ -178,13 +215,11 @@ function Barnsligipt () {
           var extension = uri.substr((~-uri.lastIndexOf(".") >>> 0) + 2);
           // Only support jpeg/jpg file extensions.
           if (/\.jpe?g?$/i.test ($(this).attr('href'))) {
-            listing.push({
+            var slide = new Slide({
               'id': index,
-              'src': uri,
-              'thumbnail': false,
-              'exif': false,
-              'loaded': false
+              'src': uri
             });
+            listing.push(slide);
           }
         });
       });
@@ -201,13 +236,11 @@ function Barnsligipt () {
         $.each(data, function(index, value) {
         // Only support jpeg/jpg file extensions.
         if (/\.jpe?g?$/i.test (value.name)) {
-          listing.push({
+          var slide = new Slide({
             'id': index,
-            'src': value.path,
-            'thumbnail': false,
-            'exif': false,
-            'loaded': false
-           });
+            'src': uri
+          });
+          listing.push(slide);
         }
       });
    });

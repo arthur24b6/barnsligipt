@@ -75,7 +75,7 @@
     <div id="slide">
       <img {{bind-attr src=src}} {{bind-attr data-id=id}} />
       {{#if exif}}
-      <div class="exif-data">{{exif}}</div>
+      <div class="exif-data">{{exif.cameraMake}} {{exif.cameraModel}} {{exif.dateTime}}</div>
       {{/if}}
     </div>
     </script>
