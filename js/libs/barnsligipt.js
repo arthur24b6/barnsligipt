@@ -48,7 +48,7 @@ function Barnsligipt () {
     baseURL: '',
     imagesPerPage: 4,
     gitHubListing: 'https://api.github.com/repos/arthur24b6/patar/contents/images',
-    //useDemoImages: true
+    useDemoImages: true
   };
 
   /* ********************************* */
