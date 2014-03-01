@@ -52,21 +52,75 @@ App.EmberSlide = Ember.Object.extend({
  * @type @exp;Ember@pro;Object@call;extend
  */
 App.EmberSlides = Ember.Object.extend({
+
+  settings: {
+    contentDirectory: 'images/',
+    baseURL: '',
+    slidesPerPage: 4,
+    gitHubListing: 'https://api.github.com/repos/arthur24b6/barnsligipt/contents/images',
+    //useDemoImages: true
+  },
+
   slides: [],
   currentSlide: 0,
   currentPage: 0,
-  slidesPerPage: 4,
 
   init: function () {
-    var barnsligipt = new Barnsligipt();
+    if (this.settings.useDemoImages) {
+      this.getGitHubListing();
+    }
+    else {
+      this.getFileListing();
+    }
+  },
+
+
+  /**
+   * Utility function to get a listing of files from an Apache listing.
+   */
+  getFileListing: function () {
     var slides = this.slides;
-    Ember.$.each(barnsligipt.images, function (key, image) {
-      var slide = App.EmberSlide.create({
-        'src': image.src,
-        'id': image.id
+    var settings = this.settings;
+    // Get the directory listing.
+    $.ajax({url: this.settings.contentDirectory, async: false})
+      .done(function(data) {
+        var items = $(data).find('a');
+        $(items).each(function(index, value) {
+          // Apache writes the URLs relative to the directory.
+          var path = settings.contentDirectory + $(this).attr('href');
+          // Only support jpeg/jpg file extensions.
+          if (/\.jpe?g?$/i.test ($(this).attr('href'))) {
+            var slide = App.EmberSlide.create({
+              'src': path,
+              'id': index
+            });
+            slides.push(slide);
+          }
+        });
       });
-      slides.push(slide);
-    });
+  },
+
+  /**
+   * Utility function to get a listing of files from a github repo.
+   */
+  getGitHubListing: function () {
+    var slides = this.slides;
+    $.ajax({url: this.settings.gitHubListing, async: false})
+      .done(function(data) {
+        //console.dir(data);
+        $.each(data, function(index, value) {
+          // Only support jpeg/jpg file extensions.
+          if (/\.jpe?g?$/i.test (value.name)) {
+            var slide = App.EmberSlide.create({
+              'id': index,
+              'src': value.path
+            });
+            slides.push(slide);
+          }
+
+      });
+   });
+
   },
 
   /**
@@ -93,7 +147,7 @@ App.EmberSlides = Ember.Object.extend({
    * Determine the number of slide pages.
    */
   pageCount: function() {
-    var count = this.count() / this.slidesPerPage;
+    var count = this.count() / this.settings.slidesPerPage;
     return Math.ceil(count);
   },
 
@@ -102,14 +156,14 @@ App.EmberSlides = Ember.Object.extend({
    */
   nextSet: function() {
     var count = this.count();
-    var start = this.currentPage * this.slidesPerPage;
-    var stop = start + this.slidesPerPage;
+    var start = this.currentPage * this.settings.slidesPerPage;
+    var stop = start + this.settings.slidesPerPage;
 
     var display = [];
 
     if (start > count) {
       start = start - count;
-      stop = start + this.slidesPerPage;
+      stop = start + this.settings.slidesPerPage;
     }
 
     // Normal case- return the next few.
@@ -120,7 +174,7 @@ App.EmberSlides = Ember.Object.extend({
     }
 
     // Next set of full images has to wrap around the list.
-    else if (stop > count && count > this.slidesPerPage) {
+    else if (stop > count && count > this.settings.slidesPerPage) {
       var remainder = stop - count;
 
       // First slide is the current index to the total number of slides.
