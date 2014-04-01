@@ -58,7 +58,7 @@ App.EmberSlides = Ember.Object.extend({
     baseURL: '',
     slidesPerPage: 4,
     gitHubListing: 'https://api.github.com/repos/arthur24b6/barnsligipt/contents/images',
-    //useDemoImages: true
+    useDemoImages: true
   },
 
   slides: [],
